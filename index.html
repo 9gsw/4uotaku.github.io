@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4uotaku - عالم الأنمي المترجم</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        /* Custom scrollbar for dark mode */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300 select-none">
+
+    <!-- Navbar Header -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-3">
+                <a href="#" class="flex items-center gap-2 group">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-700 via-blue-600 to-sky-400 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-500/30 group-hover:scale-105 transition duration-300">
+                        4u
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-extrabold tracking-wider text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-sky-400 transition">
+                            4u<span class="text-blue-600 dark:text-sky-400">OTAKU</span>
+                        </span>
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 -mt-1 font-bold">منصة مشاهدة وترجمة الأنمي</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Action Controls & Auth Area -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                
+                <!-- Admin Add Controls -->
+                <div id="adminAddControls" class="hidden flex items-center gap-2">
+                    <button onclick="openAddAnimeModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-blue-600/20 transition flex items-center gap-1.5 active:scale-95" title="إضافة أنمي جديد">
+                        <i class="fa-solid fa-folder-plus"></i>
+                        <span class="hidden md:inline">إضافة أنمي</span>
+                    </button>
+                    <button onclick="openAddModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5 active:scale-95" title="إضافة حلقة جديدة">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        <span>إضافة حلقة</span>
+                    </button>
+                </div>
+
+                <!-- Dark / Light Theme Toggle -->
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center transition hover:scale-105 active:scale-95" title="تبديل الوضع الليلي / النهار">
+                    <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
+                </button>
+
+                <!-- Auth / User Container -->
+                <div id="authContainer" class="flex items-center">
+                    <button id="loginBtn" onclick="openAuthModal('login')" class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-bold transition shadow-md flex items-center gap-2 active:scale-95">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>تسجيل الدخول</span>
+                    </button>
+
+                    <div id="userProfile" class="hidden flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <div class="text-right">
+                            <span id="userName" class="block text-xs font-bold text-slate-900 dark:text-white leading-tight">Admin</span>
+                            <span id="userRoleBadge" class="text-[9px] px-1.5 py-0.2 rounded font-bold block bg-blue-100 text-blue-700 dark:bg-blue-600/30 dark:text-sky-400">أدمن</span>
+                        </div>
+                        <button onclick="logout()" class="mr-2 text-slate-400 hover:text-red-500 transition text-xs p-1" title="تسجيل الخروج">
+                            <i class="fa-solid fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
+
+        <!-- Search and Filter Bar -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm mb-8">
+            <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-play-circle text-blue-600 dark:text-sky-400"></i> مكتبة الحلقات والأفلام
+                    </h1>
+                    <p id="episodesCountText" class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-bold">عرض جميع الحلقات المتوفرة بالموقع</p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    <!-- Live Search Input -->
+                    <div class="relative flex-grow sm:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="searchInput" oninput="filterEpisodes()" placeholder="بحث بالأنمي، رقم الحلقة أو العنوان..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-blue-600 dark:focus:border-sky-400 rounded-xl pr-10 pl-9 py-2.5 text-xs font-bold text-slate-900 dark:text-white focus:outline-none transition">
+                        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Anime Selector Filter -->
+                    <select id="animeFilter" onchange="filterEpisodes()" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-600">
+                        <option value="all">كل الأنميات</option>
+                    </select>
+
+                    <!-- Category Filter -->
+                    <select id="categoryFilter" onchange="filterEpisodes()" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-600">
+                        <option value="all">كل التصنيفات</option>
+                        <option value="manga">أحداث المانجا (أصلية)</option>
+                        <option value="filler">فلر (غير مانجا)</option>
+                        <option value="movie">أفلام</option>
+                        <option value="ova">أوفات وحلقات خاصة</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Episodes Grid -->
+        <div id="episodesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- No Results State -->
+        <div id="noResults" class="hidden text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 my-4 shadow-sm">
+            <div class="w-20 h-20 bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-sky-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fa-solid fa-film"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">لا توجد نتائج تطابق بحثك</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">تأكد من كتابة اسم الأنمي أو رقم الحلقة بوضوح، أو أضف أنمي وحلقة جديدة من حساب الإدارة.</p>
+        </div>
+
+    </main>
+
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative p-6">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <button id="tabLogin" onclick="switchAuthTab('login')" class="text-base font-bold text-blue-600 dark:text-sky-400 border-b-2 border-blue-600 dark:border-sky-400 pb-1">تسجيل الدخول</button>
+                    <button id="tabRegister" onclick="switchAuthTab('register')" class="text-base font-bold text-slate-400 hover:text-slate-900 dark:hover:text-white pb-1">حساب جديد</button>
+                </div>
+                <button onclick="closeAuthModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition hover:bg-red-500 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 text-xs font-bold">
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">اسم المستخدم:</label>
+                    <input type="text" id="loginUsername" required placeholder="admin" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">كلمة السر:</label>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none pl-10">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                            <i id="pEyeIcon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/20 active:scale-95 text-xs">
+                    تأكيد الدخول
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" onsubmit="handleRegister(event)" class="hidden space-y-4 text-xs font-bold">
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">اختر اسم المستخدم:</label>
+                    <input type="text" id="regUsername" required placeholder="اسم حسابك..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">كلمة السر:</label>
+                    <input type="password" id="regPassword" required placeholder="••••••••" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/20 active:scale-95 text-xs">
+                    إنشاء حساب متابع
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Anime Modal (Admin Only) -->
+    <div id="addAnimeModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative p-6">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
+                <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-folder-plus text-blue-600 dark:text-sky-400"></i> إضافة أنمي جديد للأنظمة
+                </h3>
+                <button onclick="closeAddAnimeModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition hover:bg-red-500 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddNewAnime(event)" class="space-y-4 text-xs font-bold">
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">اسم الأنمي:</label>
+                    <input type="text" id="newAnimeName" required placeholder="مثال: One Piece / المحقق كونان" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">رابط الغلاف / البوستر (اختياري):</label>
+                    <input type="url" id="newAnimeCover" placeholder="https://..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/20 active:scale-95 text-xs">
+                    حفظ الأنمي بالقائمة
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Episode Modal (Admin Only) -->
+    <div id="addModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative p-6">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
+                <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-plus text-indigo-500"></i> إضافة حلقة جديدة
+                </h3>
+                <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition hover:bg-red-500 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddNewEpisode(event)" class="space-y-4 text-xs font-bold">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-slate-700 dark:text-slate-300">اختر الأنمي:</label>
+                        <button type="button" onclick="closeAddModal(); openAddAnimeModal();" class="text-blue-600 dark:text-sky-400 hover:underline">
+                            + أنمي جديد غير موجود؟
+                        </button>
+                    </div>
+                    <select id="newEpAnimeSelect" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-700 dark:text-slate-300 mb-1">رقم الحلقة:</label>
+                        <input type="text" id="newEpNum" required placeholder="1132 أو الفيلم 26" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 dark:text-slate-300 mb-1">نوع الحلقة:</label>
+                        <select id="newEpType" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                            <option value="manga">أحداث المانجا (أصلية)</option>
+                            <option value="filler">فلر (غير مانجا)</option>
+                            <option value="movie">فيلم سينمائي</option>
+                            <option value="ova">أوفا / حلقة خاصة</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">عنوان الحلقة المترجمة:</label>
+                    <input type="text" id="newEpTitle" required placeholder="اكتب عنوان الحلقة هنا..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">صورة الحلقة المصغرة (اختياري):</label>
+                    <input type="url" id="newEpThumb" placeholder="اتركه فارغاً لاستخدام غلاف الأنمي تلقائياً" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">رابط Google Drive للعرض (Preview Embed):</label>
+                    <input type="url" id="newEpDriveEmbed" required placeholder="https://drive.google.com/file/d/.../preview" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">رابط Google Drive للتحميل المباشر:</label>
+                    <input type="url" id="newEpDriveDownload" required placeholder="https://drive.google.com/..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:border-blue-600 outline-none">
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/20 active:scale-95 text-xs">
+                        نشر الحلقة بالمتصفح
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Delete Confirm Modal -->
+    <div id="deleteConfirmModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <div class="w-16 h-16 bg-red-100 dark:bg-red-950/50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl border border-red-500/20">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">تأكيد حذف الحلقة</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">هل أنت متأكد من رغبتك في حذف هذه الحلقة نهائياً من المكتبة؟</p>
+            <div class="flex items-center gap-3">
+                <button onclick="confirmDeleteAction()" class="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg shadow-red-600/20">
+                    نعم، احذف
+                </button>
+                <button onclick="closeDeleteConfirmModal()" class="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold py-2.5 rounded-xl transition">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="playerModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span id="modalEpBadge" class="bg-blue-100 dark:bg-blue-600/20 text-blue-700 dark:text-sky-400 text-[10px] font-bold px-2 py-0.5 rounded">مانجا</span>
+                        <span id="modalDate" class="text-xs text-slate-400">2026-10-02</span>
+                    </div>
+                    <h2 id="modalTitle" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-1">عنوان الحلقة</h2>
+                </div>
+                <button onclick="closePlayerModal()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-red-500 hover:text-white transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Embed Video Container -->
+            <div class="relative w-full aspect-video bg-black">
+                <iframe id="videoIframe" class="w-full h-full border-0" allowfullscreen></iframe>
+            </div>
+
+            <!-- Modal Footer Controls -->
+            <div class="p-4 bg-slate-50 dark:bg-slate-950/50 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p class="text-xs text-slate-500 dark:text-slate-400">إذا لم يعمل المشغل، يمكنك التحميل والمشاهدة مباشرة عبر زر التحميل:</p>
+                <a id="downloadBtn" href="#" target="_blank" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i>
+                    <span>تحميل من Google Drive</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 transform transition-all duration-300 opacity-0 -translate-y-20 pointer-events-none">
+        <div class="bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl font-bold text-xs flex items-center gap-3 border border-slate-700">
+            <i id="toastIcon" class="fa-solid fa-circle-check text-sky-400"></i>
+            <span id="toastMsg">إشعار</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400 font-bold">
+            <p>جميع الحقوق محفوظة منصة <span class="text-blue-600 dark:text-sky-400">4uotaku</span> &copy; 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        // App Core Data Stores
+        let episodesData = [];
+        let animesList = [];
+        let currentUser = null;
+        let pendingDeleteId = null;
+
+        // Reserve Admin Credentials
+        const ADMIN_USER = 'admin';
+        const ADMIN_PASS = '4uotakuforbestsub';
+
+        // Sample initial episodes data if storage empty
+        const initialEpisodes = [
+            {
+                id: '1001',
+                anime: 'المحقق كونان',
+                number: '1131',
+                title: 'شائعات الثانوية وغرفة السر المزدوج',
+                type: 'manga',
+                date: '2026-09-28',
+                thumbnail: 'https://placehold.co/600x350/0f172a/38bdf8?text=%D8%A7%D9%84%D9%85%D8%AD%D9%82%D9%82+%D9%83%D9%88%D9%86%D8%A7%D9%86+1131',
+                driveEmbed: 'https://drive.google.com/file/d/123/preview',
+                driveDownload: 'https://drive.google.com'
+            },
+            {
+                id: '1002',
+                anime: 'ون بيس',
+                number: '1115',
+                title: 'معركة الجزيرة الغامضة وتدخل البحرية',
+                type: 'manga',
+                date: '2026-09-25',
+                thumbnail: 'https://placehold.co/600x350/0f172a/38bdf8?text=%D9%88%D9%86+%D8%A8%D9%8A%D8%B3+1115',
+                driveEmbed: 'https://drive.google.com/file/d/124/preview',
+                driveDownload: 'https://drive.google.com'
+            }
+        ];
+
+        // Toast System
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+            if (isError) {
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-red-400';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-sky-400';
+            }
+
+            toast.classList.remove('opacity-0', '-translate-y-20');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-20');
+            }, 3000);
+        }
+
+        // Theme Toggle Logic
+        function initTheme() {
+            const savedTheme = localStorage.getItem('4uotaku_theme') || 'dark';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            } else {
+                document.documentElement.classList.remove('dark');
+                updateThemeIcon(false);
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('4uotaku_theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-blue-600';
+            }
+        }
+
+        // Auth Modal Functions
+        function openAuthModal(tab = 'login') {
+            switchAuthTab(tab);
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const regForm = document.getElementById('registerForm');
+            const tabLogin = document.getElementById('tabLogin');
+            const tabRegister = document.getElementById('tabRegister');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                tabLogin.className = 'text-base font-bold text-blue-600 dark:text-sky-400 border-b-2 border-blue-600 dark:border-sky-400 pb-1';
+                tabRegister.className = 'text-base font-bold text-slate-400 hover:text-slate-900 dark:hover:text-white pb-1';
+            } else {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                tabRegister.className = 'text-base font-bold text-blue-600 dark:text-sky-400 border-b-2 border-blue-600 dark:border-sky-400 pb-1';
+                tabLogin.className = 'text-base font-bold text-slate-400 hover:text-slate-900 dark:hover:text-white pb-1';
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('loginPassword');
+            const eyeIcon = document.getElementById('pEyeIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.className = 'fa-solid fa-eye-slash';
+            } else {
+                passInput.type = 'password';
+                eyeIcon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        // Login Handler
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value.trim();
+
+            if (u.toLowerCase() === ADMIN_USER.toLowerCase() && p === ADMIN_PASS) {
+                currentUser = { username: 'admin', role: 'admin' };
+                localStorage.setItem('4uotaku_logged_user', JSON.stringify(currentUser));
+                updateUserUI();
+                closeAuthModal();
+                showToast('تم تسجيل الدخول بصلاحية الأدمن!');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('4uotaku_registered_users') || '[]');
+            const found = users.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
+
+            if (found) {
+                currentUser = { username: found.username, role: 'user' };
+                localStorage.setItem('4uotaku_logged_user', JSON.stringify(currentUser));
+                updateUserUI();
+                closeAuthModal();
+                showToast('مرحباً بك مجدداً ' + found.username);
+            } else {
+                showToast('اسم المستخدم أو كلمة المرور غير صحيحة!', true);
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const u = document.getElementById('regUsername').value.trim();
+            const p = document.getElementById('regPassword').value.trim();
+
+            if (u.toLowerCase() === 'admin') {
+                showToast('اسم المستخدم هذا محجوز للأدمن!', true);
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('4uotaku_registered_users') || '[]');
+            if (users.some(x => x.username.toLowerCase() === u.toLowerCase())) {
+                showToast('اسم المستخدم مستعمل بالفعل!', true);
+                return;
+            }
+
+            users.push({ username: u, password: p });
+            localStorage.setItem('4uotaku_registered_users', JSON.stringify(users));
+
+            currentUser = { username: u, role: 'user' };
+            localStorage.setItem('4uotaku_logged_user', JSON.stringify(currentUser));
+            updateUserUI();
+            closeAuthModal();
+            showToast('تم إنشاء الحساب بنجاح!');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('4uotaku_logged_user');
+            updateUserUI();
+            showToast('تم تسجيل الخروج');
+        }
+
+        function updateUserUI() {
+            const loginBtn = document.getElementById('loginBtn');
+            const userProfile = document.getElementById('userProfile');
+            const adminAddControls = document.getElementById('adminAddControls');
+            const userNameSpan = document.getElementById('userName');
+
+            if (currentUser) {
+                loginBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                userNameSpan.innerText = currentUser.username;
+
+                if (currentUser.role === 'admin') {
+                    adminAddControls.classList.remove('hidden');
+                } else {
+                    adminAddControls.classList.add('hidden');
+                }
+            } else {
+                loginBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+                adminAddControls.classList.add('hidden');
+            }
+
+            filterEpisodes();
+        }
+
+        // Add Anime Logic
+        function openAddAnimeModal() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            document.getElementById('addAnimeModal').classList.remove('hidden');
+        }
+
+        function closeAddAnimeModal() {
+            document.getElementById('addAnimeModal').classList.add('hidden');
+        }
+
+        function handleAddNewAnime(e) {
+            e.preventDefault();
+            const name = document.getElementById('newAnimeName').value.trim();
+            let cover = document.getElementById('newAnimeCover').value.trim();
+
+            if (!name) return;
+            if (!cover) {
+                cover = `https://placehold.co/600x350/0f172a/38bdf8?text=${encodeURIComponent(name)}`;
+            }
+
+            if (animesList.some(a => a.name.toLowerCase() === name.toLowerCase())) {
+                showToast('هذا الأنمي مضاف مسبقاً!', true);
+                return;
+            }
+
+            const newAnime = { id: Date.now(), name: name, cover: cover };
+            animesList.push(newAnime);
+            localStorage.setItem('4uotaku_animes_list', JSON.stringify(animesList));
+
+            updateAnimeSelectDropdowns();
+            closeAddAnimeModal();
+            document.getElementById('newAnimeName').value = '';
+            document.getElementById('newAnimeCover').value = '';
+            showToast(`تمت إضافة أنمي "${name}" بنجاح`);
+        }
+
+        // Add Episode Logic
+        function openAddModal() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            updateAnimeSelectDropdowns();
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+        }
+
+        function updateAnimeSelectDropdowns() {
+            const filterSelect = document.getElementById('animeFilter');
+            const addEpSelect = document.getElementById('newEpAnimeSelect');
+            const curVal = filterSelect.value;
+
+            filterSelect.innerHTML = '<option value="all">كل الأنميات</option>';
+            addEpSelect.innerHTML = '';
+
+            if (animesList.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = 'أنمي عام';
+                opt.textContent = 'أنمي عام';
+                addEpSelect.appendChild(opt);
+            } else {
+                animesList.forEach(a => {
+                    const o1 = document.createElement('option');
+                    o1.value = a.name;
+                    o1.textContent = a.name;
+                    filterSelect.appendChild(o1);
+
+                    const o2 = document.createElement('option');
+                    o2.value = a.name;
+                    o2.textContent = a.name;
+                    addEpSelect.appendChild(o2);
+                });
+            }
+
+            if (curVal) filterSelect.value = curVal;
+        }
+
+        function handleAddNewEpisode(e) {
+            e.preventDefault();
+            if (!currentUser || currentUser.role !== 'admin') return;
+
+            const anime = document.getElementById('newEpAnimeSelect').value;
+            const num = document.getElementById('newEpNum').value.trim();
+            const type = document.getElementById('newEpType').value;
+            const title = document.getElementById('newEpTitle').value.trim();
+            let thumb = document.getElementById('newEpThumb').value.trim();
+            const driveEmbed = document.getElementById('newEpDriveEmbed').value.trim();
+            const driveDownload = document.getElementById('newEpDriveDownload').value.trim();
+
+            if (!thumb) {
+                const foundAnime = animesList.find(a => a.name === anime);
+                thumb = foundAnime && foundAnime.cover ? foundAnime.cover : `https://placehold.co/600x350/0f172a/38bdf8?text=${encodeURIComponent(anime + ' ' + num)}`;
+            }
+
+            const newEp = {
+                id: Date.now().toString(),
+                anime: anime,
+                number: num,
+                title: title,
+                type: type,
+                date: new Date().toISOString().split('T')[0],
+                thumbnail: thumb,
+                driveEmbed: driveEmbed,
+                driveDownload: driveDownload
+            };
+
+            episodesData.unshift(newEp);
+            localStorage.setItem('4uotaku_custom_episodes', JSON.stringify(episodesData));
+
+            filterEpisodes();
+            closeAddModal();
+            showToast('تمت إضافة الحلقة بنجاح!');
+        }
+
+        // Delete Episode Modal Controls
+        function openDeleteConfirmModal(id) {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            pendingDeleteId = id;
+            document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        }
+
+        function closeDeleteConfirmModal() {
+            pendingDeleteId = null;
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+        }
+
+        function confirmDeleteAction() {
+            if (!pendingDeleteId) return;
+
+            episodesData = episodesData.filter(e => e.id != pendingDeleteId);
+            localStorage.setItem('4uotaku_custom_episodes', JSON.stringify(episodesData));
+
+            closeDeleteConfirmModal();
+            filterEpisodes();
+            showToast('تم حذف الحلقة بنجاح');
+        }
+
+        // Render Episodes List
+        function renderEpisodes(list) {
+            const grid = document.getElementById('episodesGrid');
+            const noResults = document.getElementById('noResults');
+            const epCountText = document.getElementById('episodesCountText');
+            grid.innerHTML = '';
+
+            if (epCountText) {
+                epCountText.innerText = `عرض ${list.length} من أصل ${episodesData.length} حلقة متوفرة`;
+            }
+
+            if (!list || list.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            const isAdmin = currentUser && currentUser.role === 'admin';
+
+            list.forEach(ep => {
+                let badgeColor = 'bg-blue-100 dark:bg-blue-600/20 text-blue-700 dark:text-sky-400 border-blue-300 dark:border-blue-500/30';
+                let badgeText = 'مانجا';
+
+                if (ep.type === 'filler') {
+                    badgeColor = 'bg-sky-100 dark:bg-sky-600/20 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-500/30';
+                    badgeText = 'فلر';
+                } else if (ep.type === 'movie') {
+                    badgeColor = 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-400 dark:border-slate-700';
+                    badgeText = 'فيلم';
+                } else if (ep.type === 'ova') {
+                    badgeColor = 'bg-indigo-100 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-400 border-indigo-300 dark:border-indigo-500/30';
+                    badgeText = 'أوفا';
+                }
+
+                const animeTitle = ep.anime || 'أنمي';
+
+                const cardHtml = `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition duration-300 flex flex-col group shadow-sm hover:shadow-lg relative">
+                        <div class="relative aspect-video bg-slate-950 overflow-hidden">
+                            <img src="${ep.thumbnail}" alt="${ep.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x350/0f172a/ffffff?text=${encodeURIComponent(animeTitle)}'">
+                            <div class="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/0 transition"></div>
+                            
+                            <span class="absolute top-3 left-3 bg-slate-950/80 text-sky-400 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-500/30 backdrop-blur-md">
+                                ${animeTitle}
+                            </span>
+
+                            <span class="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-lg border ${badgeColor} backdrop-blur-md">
+                                ${badgeText}
+                            </span>
+
+                            <span class="absolute bottom-3 right-3 bg-slate-950/90 text-white text-[11px] font-bold px-2.5 py-0.5 rounded border border-slate-800">
+                                ${ep.number.includes('الفيلم') || ep.number.includes('أوفا') ? ep.number : 'الحلقة ' + ep.number}
+                            </span>
+
+                            ${isAdmin ? `
+                                <button onclick="openDeleteConfirmModal('${ep.id}')" title="حذف الحلقة" class="absolute bottom-3 left-3 bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg flex items-center justify-center transition border border-red-500 backdrop-blur-md shadow-lg z-10 active:scale-95">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+
+                        <div class="p-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-blue-600 dark:group-hover:text-sky-400 transition line-clamp-1 mb-2">
+                                    ${ep.title}
+                                </h3>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 font-bold">
+                                    <i class="fa-regular fa-clock text-slate-400"></i> ${ep.date}
+                                </p>
+                            </div>
+
+                            <button onclick="playEpisode('${ep.id}')" class="mt-4 w-full bg-slate-100 hover:bg-blue-600 dark:bg-slate-800 dark:hover:bg-blue-600 text-slate-800 hover:text-white dark:text-slate-200 font-bold py-2 rounded-xl text-xs border border-slate-200 dark:border-slate-700 hover:border-blue-600 transition flex items-center justify-center gap-2 active:scale-95">
+                                <i class="fa-solid fa-play text-blue-600 group-hover:text-white dark:text-sky-400"></i>
+                                <span>مشاهدة وتحميل</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHtml;
+            });
+        }
+
+        // Live Search and Filter
+        function filterEpisodes() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const selectedAnime = document.getElementById('animeFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+            const clearBtn = document.getElementById('clearSearchBtn');
+
+            if (clearBtn) {
+                if (query.length > 0) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                }
+            }
+
+            const filtered = episodesData.filter(ep => {
+                const epAnime = ep.anime || 'أنمي عام';
+                const matchesAnime = (selectedAnime === 'all') || (epAnime === selectedAnime);
+                const matchesCategory = (category === 'all') || (ep.type === category);
+                
+                const matchesQuery = !query || 
+                                     ep.title.toLowerCase().includes(query) || 
+                                     ep.number.toString().toLowerCase().includes(query) ||
+                                     epAnime.toLowerCase().includes(query);
+
+                return matchesAnime && matchesCategory && matchesQuery;
+            });
+
+            renderEpisodes(filtered);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterEpisodes();
+        }
+
+        // Player Functions
+        function playEpisode(id) {
+            const ep = episodesData.find(e => e.id == id);
+            if (!ep) return;
+
+            const animePrefix = ep.anime ? `[${ep.anime}] ` : '';
+            document.getElementById('modalTitle').innerText = animePrefix + (ep.number.includes('الفيلم') || ep.number.includes('أوفا') ? '' : 'الحلقة ' + ep.number + ' : ') + ep.title;
+            document.getElementById('modalDate').innerText = ep.date;
+
+            const badge = document.getElementById('modalEpBadge');
+            badge.innerText = ep.type === 'manga' ? 'مانجا' : (ep.type === 'filler' ? 'فلر' : (ep.type === 'movie' ? 'فيلم' : 'أوفا'));
+
+            const iframe = document.getElementById('videoIframe');
+            iframe.src = ep.driveEmbed || '';
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.href = ep.driveDownload || '#';
+
+            document.getElementById('playerModal').classList.remove('hidden');
+        }
+
+        function closePlayerModal() {
+            const iframe = document.getElementById('videoIframe');
+            iframe.src = '';
+            document.getElementById('playerModal').classList.add('hidden');
+        }
+
+        // Init on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+
+            // Load Saved Animes List
+            const savedAnimes = JSON.parse(localStorage.getItem('4uotaku_animes_list') || '[]');
+            if (savedAnimes.length === 0) {
+                animesList = [
+                    { id: 1, name: 'المحقق كونان', cover: 'https://placehold.co/600x350/0f172a/38bdf8?text=%D8%A7%D9%84%D9%85%D8%AD%D9%82%D9%82+%D9%83%D9%88%D9%86%D8%A7%D9%86' },
+                    { id: 2, name: 'ون بيس', cover: 'https://placehold.co/600x350/0f172a/38bdf8?text=%D9%88%D9%86+%D8%A8%D9%8A%D8%B3' }
+                ];
+                localStorage.setItem('4uotaku_animes_list', JSON.stringify(animesList));
+            } else {
+                animesList = savedAnimes;
+            }
+
+            // Load Saved User
+            const savedUser = localStorage.getItem('4uotaku_logged_user');
+            if (savedUser) {
+                try { currentUser = JSON.parse(savedUser); } catch(e) {}
+            }
+
+            // Load Saved Episodes or default
+            const savedEp = JSON.parse(localStorage.getItem('4uotaku_custom_episodes') || '[]');
+            if (savedEp.length === 0) {
+                episodesData = [...initialEpisodes];
+                localStorage.setItem('4uotaku_custom_episodes', JSON.stringify(episodesData));
+            } else {
+                episodesData = savedEp;
+            }
+
+            updateUserUI();
+            updateAnimeSelectDropdowns();
+            filterEpisodes();
+        });
+    </script>
+</body>
+</html>
